@@ -20,6 +20,20 @@ void print_usage(char *prog_name) {
                     "\"timer1 timer2 timer3\" as TIMESTRING\n");
 }
 
+void print_frame(unsigned char *frame, unsigned char msg_len) {
+    printf("%02X", frame[0]);
+    printf(" %02X", frame[1]);
+    printf(" %02X", frame[2]);
+    printf(" %02X", frame[3]);
+    printf(" %02X", frame[4]);
+    printf(" %02X ", frame[5]);
+    for (int i = 0; i < msg_len; i++) {
+        printf("%c", frame[6 + i]);
+    }
+    printf(" %02X", frame[6 + msg_len]);
+    printf("%c\n", '\0');
+}
+
 int setup_uart() {
     int serial_port = open("/dev/ttyS3", O_RDWR);
 
