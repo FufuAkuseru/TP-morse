@@ -1,2 +1,4 @@
 .vscode/
 .clang-format
+src/obj/
+src/*.exe
