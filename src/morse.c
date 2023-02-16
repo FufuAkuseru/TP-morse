@@ -15,13 +15,14 @@ int main(int argc, char **argv) {
 
     int           c;
     extern char  *optarg;
-    char         *msg                   = calloc(MSG_SIZE, sizeof(char));
-    unsigned char msg_to_send[MSG_SIZE] = {};
-    bool          s_flag                = false;
-    bool          b_flag                = false;
-    unsigned char repeat                = 1;
-    unsigned char timer_ms[3]           = {10, 50, 100};
-    unsigned char msg_len               = 0;
+    char         *msg             = calloc(MSG_SIZE, sizeof(char));
+    unsigned char frame[MSG_SIZE] = {};
+    bool          s_flag          = false;
+    bool          b_flag          = false;
+    unsigned char repeat          = 1;
+    unsigned char timer_ms[3]     = {10, 50, 100};
+    unsigned char msg_len         = 0;
+    bool          default_timers  = true;
 
     while ((c = getopt(argc, argv, "bhm:n:st:")) != -1) {
         switch (c) {
@@ -65,9 +66,10 @@ int main(int argc, char **argv) {
                 s_flag = true;
                 break;
             case 't':
-                timer_ms[0] = (unsigned char) atoi(strtok(optarg, " "));
-                timer_ms[1] = (unsigned char) atoi(strtok(NULL, " "));
-                timer_ms[2] = (unsigned char) atoi(strtok(NULL, " "));
+                default_timers = false;
+                timer_ms[0]    = (unsigned char) atoi(strtok(optarg, " "));
+                timer_ms[1]    = (unsigned char) atoi(strtok(NULL, " "));
+                timer_ms[2]    = (unsigned char) atoi(strtok(NULL, " "));
                 break;
             case 'h':
             default:
@@ -78,11 +80,12 @@ int main(int argc, char **argv) {
     }
 
     if (s_flag) {
-        unsigned char stop_msg[] = {
-            0, 1,   timer_ms[0] * 10, timer_ms[1] * 10, timer_ms[2] * 10,
+        unsigned char stop_frame[] = {
+            0, 1,   timer_ms[0] / 10, timer_ms[1] / 10, timer_ms[2] / 10,
             0, '\n'};
         printf("Stopping\n");
-        if (write(serial_port, stop_msg, sizeof(stop_msg)) == -1) {
+        print_frame(stop_frame, 0);
+        if (write(serial_port, stop_frame, sizeof(stop_frame)) == -1) {
             fprintf(stderr, "Couldn't write to serial port (%d)\n",
                     serial_port);
             exit(3);
@@ -106,22 +109,22 @@ int main(int argc, char **argv) {
     printf("\n");
 
     /* BUILDING MESSAGE TO SEND */
-    msg_to_send[0] = b_flag;
-    msg_to_send[1] = repeat;
-    msg_to_send[2] = timer_ms[0] * 10;
-    msg_to_send[3] = timer_ms[1] * 10;
-    msg_to_send[4] = timer_ms[2] * 10;
-    msg_to_send[5] = msg_len;
+    frame[0] = b_flag;
+    frame[1] = repeat;
+    frame[2] = default_timers ? timer_ms[0] : timer_ms[0] / 10;
+    frame[3] = default_timers ? timer_ms[1] : timer_ms[1] / 10;
+    frame[4] = default_timers ? timer_ms[2] : timer_ms[2] / 10;
+    frame[5] = msg_len;
     for (int i = 0; i < msg_len; i++) {
-        msg_to_send[6 + i] = (unsigned char) msg[i];
+        frame[6 + i] = (unsigned char) msg[i];
     }
-    msg_to_send[6 + msg_len] = '\n';
+    frame[6 + msg_len] = '\n';
 
-    print_frame(msg_to_send, msg_len);
+    print_frame(frame, msg_len);
 
     free(msg);
 
-    if (write(serial_port, msg_to_send, msg_len + 7) == -1) {
+    if (write(serial_port, frame, msg_len + 7) == -1) {
         fprintf(stderr, "Couldn't write to serial port (%d)\n", serial_port);
         exit(5);
     }

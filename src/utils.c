@@ -114,6 +114,7 @@ int setup_uart() {
 
     /* Prevent special interpretation of output bytes (e.g. newline chars) */
     tty.c_oflag &= ~OPOST;
+
     /* Prevent conversion of newline to carriage return/line feed */
     tty.c_oflag &= ~ONLCR;
 
