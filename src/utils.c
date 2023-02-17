@@ -3,13 +3,15 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <termios.h>
+#include <windows.h>
 
 void print_usage(char *prog_name) {
     fprintf(stderr,
             "Usage: %s [-b] [-h] [-m MSGSTRING] [-n REPEAT] [-s] [-t "
-            "TIMESTRING]\n",
+            "TIMESTRING] [-o OUTPUT] [-T\n",
             prog_name);
     fprintf(stderr, "\t-b: loop message\n");
     fprintf(stderr, "\t-h: show this message\n");
@@ -18,6 +20,10 @@ void print_usage(char *prog_name) {
     fprintf(stderr, "\t-s: stop the program\n");
     fprintf(stderr, "\t-t TIMESTRING: setting up the timers with the format "
                     "\"timer1 timer2 timer3\" as TIMESTRING\n");
+    fprintf(stderr, "\t-o OUTPUT: prints the frame sent into a given file\n"
+                    "(Prints it as a C array initializer)");
+    fprintf(stderr, "\t-T OUTPUT: prints the frame sent into a given file\n"
+                    "(Prints it as a C array initializer)");
 }
 
 void print_frame(unsigned char *frame, unsigned char msg_len) {
@@ -35,7 +41,7 @@ void print_frame(unsigned char *frame, unsigned char msg_len) {
 }
 
 int setup_uart() {
-    int serial_port = open("/dev/ttyS3", O_RDWR);
+    int serial_port = open("/dev/ttyS6", O_RDWR);
 
     /* Check for errors */
     if (serial_port < 0) {
@@ -137,4 +143,229 @@ int setup_uart() {
         printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
     }
     return serial_port;
+}
+
+char *convert_char(char c) {
+    char *code = (char *) calloc(4, sizeof(char));
+    switch (c) {
+        case 'a':
+        case 'A':
+            code[0] = 1;
+            code[1] = 2;
+            code[2] = 0;
+            code[3] = 0;
+            break;
+        case 'b':
+        case 'B':
+            code[0] = 2;
+            code[1] = 1;
+            code[2] = 1;
+            code[3] = 0;
+            break;
+        case 'c':
+        case 'C':
+            code[0] = 2;
+            code[1] = 1;
+            code[2] = 2;
+            code[3] = 1;
+            break;
+        case 'd':
+        case 'D':
+            code[0] = 2;
+            code[1] = 1;
+            code[2] = 1;
+            code[3] = 0;
+            break;
+        case 'e':
+        case 'E':
+            code[0] = 1;
+            code[1] = 0;
+            code[2] = 0;
+            code[3] = 0;
+            break;
+        case 'f':
+        case 'F':
+            code[0] = 1;
+            code[1] = 1;
+            code[2] = 2;
+            code[3] = 1;
+            break;
+        case 'g':
+        case 'G':
+            code[0] = 2;
+            code[1] = 2;
+            code[2] = 1;
+            code[3] = 0;
+            break;
+        case 'h':
+        case 'H':
+            code[0] = 1;
+            code[1] = 1;
+            code[2] = 1;
+            code[3] = 1;
+            break;
+        case 'i':
+        case 'I':
+            code[0] = 1;
+            code[1] = 1;
+            code[2] = 0;
+            code[3] = 0;
+            break;
+        case 'j':
+        case 'J':
+            code[0] = 1;
+            code[1] = 2;
+            code[2] = 2;
+            code[3] = 2;
+            break;
+        case 'k':
+        case 'K':
+            code[0] = 2;
+            code[1] = 1;
+            code[2] = 2;
+            code[3] = 0;
+            break;
+        case 'l':
+        case 'L':
+            code[0] = 1;
+            code[1] = 2;
+            code[2] = 1;
+            code[3] = 1;
+            break;
+        case 'm':
+        case 'M':
+            code[0] = 2;
+            code[1] = 2;
+            code[2] = 0;
+            code[3] = 0;
+            break;
+        case 'n':
+        case 'N':
+            code[0] = 2;
+            code[1] = 1;
+            code[2] = 0;
+            code[3] = 0;
+            break;
+        case 'o':
+        case 'O':
+            code[0] = 2;
+            code[1] = 2;
+            code[2] = 2;
+            code[3] = 0;
+            break;
+        case 'p':
+        case 'P':
+            code[0] = 1;
+            code[1] = 2;
+            code[2] = 2;
+            code[3] = 1;
+            break;
+        case 'q':
+        case 'Q':
+            code[0] = 2;
+            code[1] = 2;
+            code[2] = 1;
+            code[3] = 2;
+            break;
+        case 'r':
+        case 'R':
+            code[0] = 1;
+            code[1] = 2;
+            code[2] = 1;
+            code[3] = 0;
+            break;
+        case 's':
+        case 'S':
+            code[0] = 1;
+            code[1] = 1;
+            code[2] = 1;
+            code[3] = 0;
+            break;
+        case 't':
+        case 'T':
+            code[0] = 2;
+            code[1] = 0;
+            code[2] = 0;
+            code[3] = 0;
+            break;
+        case 'u':
+        case 'U':
+            code[0] = 1;
+            code[1] = 1;
+            code[2] = 2;
+            code[3] = 0;
+            break;
+        case 'v':
+        case 'V':
+            code[0] = 1;
+            code[1] = 1;
+            code[2] = 1;
+            code[3] = 2;
+            break;
+        case 'w':
+        case 'W':
+            code[0] = 1;
+            code[1] = 2;
+            code[2] = 2;
+            code[3] = 0;
+            break;
+        case 'x':
+        case 'X':
+            code[0] = 2;
+            code[1] = 1;
+            code[2] = 1;
+            code[3] = 2;
+            break;
+        case 'y':
+        case 'Y':
+            code[0] = 2;
+            code[1] = 1;
+            code[2] = 2;
+            code[3] = 2;
+            break;
+        case 'z':
+        case 'Z':
+            code[0] = 2;
+            code[1] = 2;
+            code[2] = 1;
+            code[3] = 1;
+            break;
+        default:
+            code[0] = 0;
+            code[1] = 0;
+            code[2] = 0;
+            code[3] = 0;
+            break;
+    }
+    char *ptr_code = code;
+    return ptr_code;
+}
+
+void morse_to_beep(unsigned char short_delay, unsigned char medium_delay,
+                   unsigned char long_delay, char *code) {
+    char space[4] = {0, 0, 0, 0};
+    if (!memcmp(space, code, 4 * sizeof(char))) {
+        Sleep(long_delay * 10);
+        printf(" ");
+    } else {
+        for (unsigned char i = 0; i < 4; ++i) {
+            switch (code[i]) {
+                case 1:
+                    Beep(840, short_delay * 10);
+                    Sleep(short_delay * 10);
+                    /* printf("."); */
+                    break;
+                case 2:
+                    Beep(440, medium_delay * 10);
+                    Sleep(short_delay * 10);
+                    /* printf("-"); */
+                    break;
+                case 0:
+                default:
+                    Sleep(short_delay * 10);
+                    /* printf(" "); */
+                    break;
+            }
+        }
+    }
 }
