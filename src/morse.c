@@ -11,7 +11,7 @@
 #define MSG_SIZE 256
 
 int main(int argc, char **argv) {
-    int serial_port = setup_uart();
+    // int serial_port = setup_uart();
 
     int           c;
     extern char  *optarg;
@@ -117,11 +117,11 @@ int main(int argc, char **argv) {
                                       '\n'};
         printf("Stopping\n");
         print_frame(stop_frame, 0);
-        if (write(serial_port, stop_frame, sizeof(stop_frame)) == -1) {
-            fprintf(stderr, "Couldn't write to serial port (%d)\n",
-                    serial_port);
-            exit(3);
-        }
+        // if (write(serial_port, stop_frame, sizeof(stop_frame)) == -1) {
+        //     fprintf(stderr, "Couldn't write to serial port (%d)\n",
+        //             serial_port);
+        //     exit(3);
+        // }
         exit(0);
     }
 
@@ -176,10 +176,10 @@ int main(int argc, char **argv) {
     free(msg);
     free(output_filename);
 
-    if (write(serial_port, frame, msg_len + 7) == -1) {
-        fprintf(stderr, "Couldn't write to serial port (%d)\n", serial_port);
-        exit(5);
-    }
+    // if (write(serial_port, frame, msg_len + 7) == -1) {
+    //     fprintf(stderr, "Couldn't write to serial port (%d)\n", serial_port);
+    //     exit(5);
+    // }
 
     return 0;
 }

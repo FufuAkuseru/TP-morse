@@ -1,12 +1,13 @@
 #include "utils.h"
 
+#include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <termios.h>
-#include <windows.h>
+// #include <windows.h>
 
 void print_usage(char *prog_name) {
     fprintf(stderr,
@@ -146,224 +147,154 @@ int setup_uart() {
 }
 
 char *convert_char(char c) {
-    char *code = (char *) calloc(4, sizeof(char));
-    switch (c) {
-        case 'a':
-        case 'A':
-            code[0] = 1;
-            code[1] = 2;
-            code[2] = 0;
-            code[3] = 0;
-            break;
-        case 'b':
-        case 'B':
-            code[0] = 2;
-            code[1] = 1;
-            code[2] = 1;
-            code[3] = 0;
-            break;
-        case 'c':
-        case 'C':
-            code[0] = 2;
-            code[1] = 1;
-            code[2] = 2;
-            code[3] = 1;
-            break;
-        case 'd':
-        case 'D':
-            code[0] = 2;
-            code[1] = 1;
-            code[2] = 1;
-            code[3] = 0;
-            break;
-        case 'e':
-        case 'E':
-            code[0] = 1;
-            code[1] = 0;
-            code[2] = 0;
-            code[3] = 0;
-            break;
-        case 'f':
-        case 'F':
-            code[0] = 1;
-            code[1] = 1;
-            code[2] = 2;
-            code[3] = 1;
-            break;
-        case 'g':
-        case 'G':
-            code[0] = 2;
-            code[1] = 2;
-            code[2] = 1;
-            code[3] = 0;
-            break;
-        case 'h':
-        case 'H':
-            code[0] = 1;
-            code[1] = 1;
-            code[2] = 1;
-            code[3] = 1;
-            break;
-        case 'i':
-        case 'I':
-            code[0] = 1;
-            code[1] = 1;
-            code[2] = 0;
-            code[3] = 0;
-            break;
-        case 'j':
-        case 'J':
-            code[0] = 1;
-            code[1] = 2;
-            code[2] = 2;
-            code[3] = 2;
-            break;
-        case 'k':
-        case 'K':
-            code[0] = 2;
-            code[1] = 1;
-            code[2] = 2;
-            code[3] = 0;
-            break;
-        case 'l':
-        case 'L':
-            code[0] = 1;
-            code[1] = 2;
-            code[2] = 1;
-            code[3] = 1;
-            break;
-        case 'm':
-        case 'M':
-            code[0] = 2;
-            code[1] = 2;
-            code[2] = 0;
-            code[3] = 0;
-            break;
-        case 'n':
-        case 'N':
-            code[0] = 2;
-            code[1] = 1;
-            code[2] = 0;
-            code[3] = 0;
-            break;
-        case 'o':
-        case 'O':
-            code[0] = 2;
-            code[1] = 2;
-            code[2] = 2;
-            code[3] = 0;
-            break;
-        case 'p':
-        case 'P':
-            code[0] = 1;
-            code[1] = 2;
-            code[2] = 2;
-            code[3] = 1;
-            break;
-        case 'q':
-        case 'Q':
-            code[0] = 2;
-            code[1] = 2;
-            code[2] = 1;
-            code[3] = 2;
-            break;
-        case 'r':
-        case 'R':
-            code[0] = 1;
-            code[1] = 2;
-            code[2] = 1;
-            code[3] = 0;
-            break;
-        case 's':
-        case 'S':
-            code[0] = 1;
-            code[1] = 1;
-            code[2] = 1;
-            code[3] = 0;
-            break;
-        case 't':
-        case 'T':
-            code[0] = 2;
-            code[1] = 0;
-            code[2] = 0;
-            code[3] = 0;
-            break;
-        case 'u':
-        case 'U':
-            code[0] = 1;
-            code[1] = 1;
-            code[2] = 2;
-            code[3] = 0;
-            break;
-        case 'v':
-        case 'V':
-            code[0] = 1;
-            code[1] = 1;
-            code[2] = 1;
-            code[3] = 2;
-            break;
-        case 'w':
-        case 'W':
-            code[0] = 1;
-            code[1] = 2;
-            code[2] = 2;
-            code[3] = 0;
-            break;
-        case 'x':
-        case 'X':
-            code[0] = 2;
-            code[1] = 1;
-            code[2] = 1;
-            code[3] = 2;
-            break;
-        case 'y':
-        case 'Y':
-            code[0] = 2;
-            code[1] = 1;
-            code[2] = 2;
-            code[3] = 2;
-            break;
-        case 'z':
-        case 'Z':
-            code[0] = 2;
-            code[1] = 2;
-            code[2] = 1;
-            code[3] = 1;
-            break;
-        default:
-            code[0] = 0;
-            code[1] = 0;
-            code[2] = 0;
-            code[3] = 0;
-            break;
+    if (isalpha(c)) {
+        switch (tolower(c)) {
+            case 'a':
+                return ".-";
+                break;
+            case 'b':
+                return "-..";
+                break;
+            case 'c':
+                return "-.-.";
+                break;
+            case 'd':
+                return "-..";
+            case 'e':
+                return ".";
+                break;
+            case 'f':
+                return "..-.";
+                break;
+            case 'g':
+                return "--.";
+                break;
+            case 'h':
+                return "....";
+                break;
+            case 'i':
+                return "..";
+                break;
+            case 'j':
+                return ".---";
+                break;
+            case 'k':
+                return "-.-";
+                break;
+            case 'l':
+                return ".-..";
+                break;
+            case 'm':
+                return "--";
+                break;
+            case 'n':
+                return "-.";
+                break;
+            case 'o':
+                return "---";
+                break;
+            case 'p':
+                return ".--.";
+                break;
+            case 'q':
+                return "--.-";
+                break;
+            case 'r':
+                return ".-.";
+                break;
+            case 's':
+                return "...";
+                break;
+            case 't':
+                return "-";
+                break;
+            case 'u':
+                return "..-";
+                break;
+            case 'v':
+                return "...-";
+                break;
+            case 'w':
+                return ".--";
+                break;
+            case 'x':
+                return "-..-";
+                break;
+            case 'y':
+                return "-.--";
+                break;
+            case 'z':
+                return "--..";
+                break;
+            default:
+                return "";
+                break;
+        }
+    } else if (isdigit(c)) {
+        switch (c) {
+            case '0':
+                return "-----";
+                break;
+            case '1':
+                return ".----";
+                break;
+            case '2':
+                return "..---";
+                break;
+            case '3':
+                return "...--";
+                break;
+            case '4':
+                return "....-";
+                break;
+            case '5':
+                return ".....";
+                break;
+            case '6':
+                return "-....";
+                break;
+            case '7':
+                return "--...";
+                break;
+            case '8':
+                return "---..";
+                break;
+            case '9':
+                return "----.";
+                break;
+            default:
+                return "";
+                break;
+        }
+    } else if (c == ' ') {
+        return "/";
+    } else {
+        return "";
     }
-    char *ptr_code = code;
-    return ptr_code;
 }
 
 void morse_to_beep(unsigned char short_delay, unsigned char medium_delay,
                    unsigned char long_delay, char *code) {
-    char space[4] = {0, 0, 0, 0};
-    if (!memcmp(space, code, 4 * sizeof(char))) {
-        Sleep(long_delay * 10);
-        printf(" ");
+    char space[4] = "/";
+    if (!strcmp(space, code)) {
+        // Sleep(long_delay * 10);
+        printf("/");
     } else {
-        for (unsigned char i = 0; i < 4; ++i) {
+        for (unsigned char i = 0; i < strlen(code); ++i) {
             switch (code[i]) {
-                case 1:
-                    Beep(840, short_delay * 10);
-                    Sleep(short_delay * 10);
-                    /* printf("."); */
+                case '.':
+                    // Beep(840, short_delay * 10);
+                    // Sleep(short_delay * 10);
+                    printf(".");
                     break;
-                case 2:
-                    Beep(440, medium_delay * 10);
-                    Sleep(short_delay * 10);
-                    /* printf("-"); */
+                case '-':
+                    // Beep(440, medium_delay * 10);
+                    // Sleep(short_delay * 10);
+                    printf("-");
                     break;
-                case 0:
                 default:
-                    Sleep(short_delay * 10);
-                    /* printf(" "); */
+                    // Sleep(short_delay * 10);
+                    printf(" ");
                     break;
             }
         }
