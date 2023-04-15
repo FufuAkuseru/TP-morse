@@ -63,7 +63,7 @@ void tim2_ON_court(void)
     while(!(TIM2->SR & TIM_SR_UIF)){  //tant y'a pas de débordement reste allumer
         __ASM("nop");
     }
-    TIM2->SR &= ~TIM_SR_UIF;   //mettre de le flag à 0
+    TIM2->SR &= ~TIM_SR_UIF;   //mettre le flag à 0
     GPIOA->ODR &= ~(1 << 5);   //etteind LED
     TIM2->CR1 &= ~TIM_CR1_CEN; //désactiver le timer2
 }
@@ -74,7 +74,7 @@ void tim2_OFF_court(void)
     while(!(TIM2->SR & TIM_SR_UIF)){ //tant y'a pas de débordement reste etteind
         __ASM("nop");
     }
-    TIM2->SR &= ~TIM_SR_UIF;  //mettre de le flag à 0
+    TIM2->SR &= ~TIM_SR_UIF;  //mettre le flag à 0
     TIM2->CR1 &= ~TIM_CR1_CEN;  //désactiver le timer2
 }
 void tim3_ON_moyen(void)
