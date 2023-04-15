@@ -14,6 +14,10 @@ void tim4_OFF_long(void);
 
 int main(void)
 {
+
+    systemClockConfig();
+	TIMERS_Config();
+    
     /* RCC */
 	RCC->APB2ENR |= (1 << 2); // Enable RCC for GPIOA Pin/Port
 	
@@ -22,14 +26,11 @@ int main(void)
 
 	/* OUTPUT */
 	GPIOA->CRL |= (1 << 21); // Set GPIO PA5 MODE (01 : output)
-    systemClockConfig();
-	TIMERS_Config();
-	
-	
+    
 
-	char* morsee[] = { "----", "-...", "-.-.", "-..", ".","..-.", "--.", "....", "..", ".---", "-.-", ".-..", "--", "-.", "---", ".--.", "--.-", ".-.", "...", "-", "..-", "...-", ".--", "-..-", "-.--", "--.." };
+	char* morsee[] = { "---", "-...", "-.-.", "-..", ".","..-.", "--.", "....", "..", ".---", "-.-", ".-..", "--", "-.", "---", ".--.", "--.-", ".-.", "...", "-", "..-", "...-", ".--", "-..-", "-.--", "--.." };
 	
-	char msg[20]={"a a a"};
+	char msg[20]={"a  a"};
 
 	//printf("rentrez une phrase: ");
 	//fgets(msg, 20, stdin);
@@ -113,6 +114,13 @@ void TIMERS_Config(void){
     TIM3->ARR = 999; /*interruption tous les 1000ms*/
     TIM4->ARR = 1999; /*interruption tous les 2000ms*/
 
+    TIM2->CR1 |= TIM_CR1_ARPE;
+    TIM3->CR1 |= TIM_CR1_ARPE;
+    TIM4->CR1 |= TIM_CR1_ARPE;
+    TIM2->SR &= ~TIM_SR_UIF;
+    TIM3->SR &= ~TIM_SR_UIF;
+    TIM4->SR &= ~TIM_SR_UIF;
+    
     /*mise a jour des valeurs psc, arr */
     //TIM2->EGR |= 1;
 }
@@ -121,7 +129,7 @@ void tim2_ON_court(void)
 {
 	TIM2->CR1 |= TIM_CR1_CEN; //activer timer2
     GPIOA->ODR |= (1 << 5);   //allumer LED
-    while((TIM2->SR & TIM_SR_UIF)==0){  //tant y'a pas de débordement reste allumer
+    while(!(TIM2->SR & TIM_SR_UIF)){  //tant y'a pas de débordement reste allumer
         __ASM("nop");
     }
     TIM2->SR &= ~TIM_SR_UIF;   //mettre de le flag à 0
@@ -132,7 +140,7 @@ void tim2_OFF_court(void)
 {
 	TIM2->CR1 |= TIM_CR1_CEN;  //activer le timer2
     GPIOA->ODR &= ~(1 << 5);   //etteind led
-    while((TIM2->SR & TIM_SR_UIF)==0){ //tant y'a pas de débordement reste etteind
+    while(!(TIM2->SR & TIM_SR_UIF)){ //tant y'a pas de débordement reste etteind
         __ASM("nop");
     }
     TIM2->SR &= ~TIM_SR_UIF;  //mettre de le flag à 0
@@ -142,7 +150,7 @@ void tim3_ON_moyen(void)
 {
 	TIM3->CR1 |= TIM_CR1_CEN;
     GPIOA->ODR |= (1 << 5);
-    while((TIM3->SR & TIM_SR_UIF)==0){
+    while(!(TIM3->SR & TIM_SR_UIF)){
         __ASM("nop");
     }
     TIM3->SR &= ~TIM_SR_UIF;
@@ -153,7 +161,7 @@ void tim3_OFF_moyen(void)
 {
 	TIM3->CR1 |= TIM_CR1_CEN;
      GPIOA->ODR &= ~(1 << 5);
-    while((TIM3->SR & TIM_SR_UIF)==0){
+    while(!(TIM3->SR & TIM_SR_UIF)){
         __ASM("nop");
     }
     TIM3->SR &= ~TIM_SR_UIF;
@@ -163,7 +171,7 @@ void tim4_ON_long(void)
 {
 	TIM4->CR1 |= TIM_CR1_CEN;
     GPIOA->ODR |= (1 << 5);
-    while((TIM4->SR & TIM_SR_UIF)==0){
+    while(!(TIM4->SR & TIM_SR_UIF)){
         __ASM("nop");
         }
     TIM4->SR &= ~TIM_SR_UIF;
@@ -174,7 +182,7 @@ void tim4_OFF_long(void)
 {
 	TIM4->CR1 |= TIM_CR1_CEN;
      GPIOA->ODR &= ~(1 << 5);
-    while((TIM4->SR & TIM_SR_UIF)==0){
+    while(!(TIM4->SR & TIM_SR_UIF)){
         __ASM("nop");
     }
     TIM4->SR &= ~TIM_SR_UIF;
