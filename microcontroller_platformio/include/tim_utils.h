@@ -1,18 +1,25 @@
-#ifndef TIM_UTILS_h
-#define TIM_UTILS_h
+#ifndef TIM_UTILS_H
+#define TIM_UTILS_H
 
 #include <stdbool.h>
 
-void start_timer_short();
-void start_timer_medium();
-void start_timer_long();
+#include "stm32f10x_register_config.h"
 
-void stop_timer_short();
-void stop_timer_medium();
-void stop_timer_long();
+/// @brief Initializes timer
+/// @param TIM Timer to initialize (must be TIM2/3/4)
+void init_tim(TIM_TypeDef *TIM);
 
-bool is_timer_done_short();
-bool is_timer_done_medium();
-bool is_timer_done_long();
+/// @brief Sets a given timer to a set ms amount
+/// @param TIM Timer to set
+/// @param ms  Amount of ms at which point to the TIMER does an interrupt
+void set_tim(TIM_TypeDef *TIM, uint16_t ms);
+
+/// @brief Starts a given timer
+/// @param TIM Timer to start
+void start_tim(TIM_TypeDef *TIM);
+
+/// @brief Stops a given timer
+/// @param TIM Timer to stop
+void stop_tim(TIM_TypeDef *TIM);
 
 #endif
