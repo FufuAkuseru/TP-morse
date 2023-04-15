@@ -1,8 +1,13 @@
-#ifndef STR_TO_BLINK_H
-#define STR_TO_BLINK_H
+#ifndef STR_TO_BLINK_h
+#define STR_TO_BLINK_h
 
-#include "stm32f103xb.h";
+#include <stdio.h> 
+#include "stm32f103xb.h"
+#include <stdlib.h>
+#include <string.h>
 
-void str_to_blink(uint8_t string_to_convert);
+void traitement(char *str, int char_octet);
+
+
 
 #endif
