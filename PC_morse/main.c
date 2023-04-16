@@ -49,6 +49,7 @@ int main(int argc, char **argv) {
     uart_msg.timers[1] = 50;
     uart_msg.timers[2] = 100;
     uart_msg.msg_size  = 0;
+    uart_msg.stop      = '\n';
     memset(uart_msg.msg, 0, 1);
 
     settings_flag_t flags = {false, false, false, false,
@@ -196,10 +197,16 @@ int main(int argc, char **argv) {
                     serial_port);
             exit(5);
         }
+        uart_msg.timers[0] = 0;
+        uart_msg.timers[1] = 0;
+        uart_msg.timers[2] = 0;
+        uart_msg.msg_size  = 0;
+        memset(uart_msg.msg, 0, 1);
     }
 
-    if (strcmp((char *) uart_msg.msg, "") == 0) {
-        fprintf(stderr, "No message was provided\n");
+    if (!strcmp((char *) uart_msg.msg, "") && !flags.s_flag) {
+        fprintf(stderr, "No message was provided.\n"
+                        "Exiting without sending anything\n");
         exit(4);
     }
 

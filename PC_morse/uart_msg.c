@@ -24,6 +24,7 @@ void print_uart_message(uart_message_t *uart_msg) {
     for (unsigned char i = 0; i < uart_msg->msg_size; ++i) {
         printf("%c", uart_msg->msg[i]);
     }
+    printf("\n");
 }
 
 int uart_setup(int com_port) {
@@ -93,7 +94,18 @@ int uart_setup(int com_port) {
 }
 
 void send_uart_message(int serial_port, uart_message_t *uart_msg) {
-    if (write(serial_port, uart_msg, uart_msg->msg_size + 6) == -1) {
+    printf("\tFrame sent:\n");
+    printf("%d ", uart_msg->loop);
+    printf("%d ", uart_msg->nb_ite);
+    printf("%d ", uart_msg->timers[0]);
+    printf("%d ", uart_msg->timers[1]);
+    printf("%d ", uart_msg->timers[2]);
+    printf("%d\n", uart_msg->msg_size);
+    for (unsigned char i = 0; i < uart_msg->msg_size; ++i) {
+        printf("%d ", uart_msg->msg[i]);
+    }
+    printf("%d\n", uart_msg->stop);
+    if (write(serial_port, uart_msg, uart_msg->msg_size + 7) == -1) {
         fprintf(stderr, "Couldn't write to serial port (%d)\n", serial_port);
         exit(5);
     }

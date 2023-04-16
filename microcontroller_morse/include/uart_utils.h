@@ -29,5 +29,6 @@ void    init_queue(uart_message_queue_t *queue);
 uint8_t queue_size(uart_message_queue_t *queue);
 void    queue_push(uart_message_queue_t *queue, uart_message_t uart_msg);
 void    queue_pop(uart_message_queue_t *queue, uart_message_t *uart_msg);
+void    empty_queue(uart_message_queue_t *queue);
 
 #endif

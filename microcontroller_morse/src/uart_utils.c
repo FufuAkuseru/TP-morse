@@ -66,3 +66,8 @@ void queue_pop(uart_message_queue_t *queue, uart_message_t *uart_msg) {
     queue->front = (queue->front + 1) % MAX_QUEUE_SIZE;
     --(queue->size);
 }
+
+void empty_queue(uart_message_queue_t *queue) {
+    init_queue(queue);
+    memset(queue, 0, MAX_QUEUE_SIZE);
+}
