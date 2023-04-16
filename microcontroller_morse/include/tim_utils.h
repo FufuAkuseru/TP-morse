@@ -1,8 +1,6 @@
 #ifndef TIM_UTILS_H
 #define TIM_UTILS_H
 
-#include <stdbool.h>
-
 #include "stm32f10x_register_config.h"
 
 /// @brief Initializes timer

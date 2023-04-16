@@ -4,10 +4,12 @@
 
 #include <ctype.h>
 #include <stdbool.h>
+#include <string.h>
 
 extern bool  tim2_done;
 extern bool  tim3_done;
 extern bool  tim4_done;
+extern bool  stop;
 extern Pin_t led1;
 
 char *convert_char(uint8_t c) {
@@ -254,5 +256,31 @@ void morse_to_blink(char *morse) {
         }
         short_wait();
         ++morse;
+    }
+}
+
+void str_to_blink(uint8_t *str, uint8_t str_size) {
+    for (uint8_t i = 0; i < str_size; ++i) {
+        morse_to_blink(convert_char(str[i]));
+    }
+}
+
+void uart_message_to_blink(uart_message_t *uart_msg) {
+    set_tim(TIM2, uart_msg->timers[0] * 10);
+    set_tim(TIM3, uart_msg->timers[1] * 10);
+    set_tim(TIM4, uart_msg->timers[2] * 10);
+    uint8_t str[256];
+    memcpy(str, uart_msg->msg, uart_msg->msg_size);
+    if (uart_msg->loop) {
+        while (!stop) {
+            str_to_blink(str, uart_msg->msg_size);
+        }
+        return;
+    } else {
+        for (uint8_t i = 0; i < uart_msg->nb_ite; ++i) {
+            if (!stop) {
+                str_to_blink(str, uart_msg->msg_size);
+            }
+        }
     }
 }

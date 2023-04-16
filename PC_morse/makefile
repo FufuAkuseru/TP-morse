@@ -25,7 +25,7 @@ $(EXE): $(OBJ)
 	@mv *.o obj/
 
 clean:
-	rm -rf obj/* *.o *.so *.a *.la
+	rm -rf obj *.o *.so *.a *.la
 
 mrproper: clean
 	rm -rf $(EXE)

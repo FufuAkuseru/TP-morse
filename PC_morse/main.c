@@ -189,8 +189,13 @@ int main(int argc, char **argv) {
     int serial_port = uart_setup(com_port);
 
     if (flags.s_flag) {
-        uart_msg.loop     = 0;
-        uart_msg.nb_ite   = 0;
+        uart_msg.loop   = 0;
+        uart_msg.nb_ite = 0;
+        if (write(serial_port, &uart_msg, 2) == -1) {
+            fprintf(stderr, "Couldn't write to serial port (%d)\n",
+                    serial_port);
+            exit(5);
+        }
         uart_msg.msg_size = 0;
         memset(uart_msg.msg, 0, 1);
     }

@@ -13,14 +13,17 @@ void print_uart_message(uart_message_t *uart_msg) {
     if (uart_msg->loop) {
         printf("\tLooping\n");
     } else {
-        printf("\t%d iteration%s", uart_msg->nb_ite,
+        printf("\t%d iteration%s\n", uart_msg->nb_ite,
                uart_msg->nb_ite == 1 ? "" : "s");
     }
     printf("\tShort timer: %d\n", uart_msg->timers[0]);
     printf("\tMedium timer: %d\n", uart_msg->timers[1]);
     printf("\tLong timer: %d\n", uart_msg->timers[2]);
     printf("\tMessage size: %d\n", uart_msg->msg_size);
-    printf("\tMessage:\n%s\n", uart_msg->msg);
+    printf("\tMessage:\n");
+    for (unsigned char i = 0; i < uart_msg->msg_size; ++i) {
+        printf("%c", uart_msg->msg[i]);
+    }
 }
 
 int uart_setup(int com_port) {
@@ -90,17 +93,7 @@ int uart_setup(int com_port) {
 }
 
 void send_uart_message(int serial_port, uart_message_t *uart_msg) {
-    /* unsigned char frame[255];
-    frame[0] = uart_msg->loop;
-    frame[1] = uart_msg->nb_ite;
-    frame[2] = uart_msg->timers[0];
-    frame[3] = uart_msg->timers[1];
-    frame[4] = uart_msg->timers[2];
-    frame[5] = uart_msg->msg_size;
-    for (unsigned char i = 0; i < uart_msg->msg_size; ++i) {
-        frame[6 + i] = uart_msg->msg[i];
-    } */
-    if (write(serial_port, uart_msg, uart_msg->msg_size + 7) == -1) {
+    if (write(serial_port, uart_msg, uart_msg->msg_size + 6) == -1) {
         fprintf(stderr, "Couldn't write to serial port (%d)\n", serial_port);
         exit(5);
     }
