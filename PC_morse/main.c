@@ -196,8 +196,11 @@ int main(int argc, char **argv) {
                     serial_port);
             exit(5);
         }
-        uart_msg.msg_size = 0;
-        memset(uart_msg.msg, 0, 1);
+    }
+
+    if (strcmp((char *) uart_msg.msg, "") == 0) {
+        fprintf(stderr, "No message was provided\n");
+        exit(4);
     }
 
     print_uart_message(&uart_msg);
