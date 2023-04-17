@@ -7,6 +7,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-void string_to_morse(uint8_t *str, int str_length);
+/// @brief Converts a uint8_t string into blinking the builtin LED in morse
+/// @param str        The string to convert
+/// @param str_length The length of the string
+void string_to_morse(uint8_t *str, uint8_t str_length);
 
 #endif

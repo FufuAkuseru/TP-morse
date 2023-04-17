@@ -27,6 +27,8 @@ Pin_t rx = {GPIOA, 3};
 volatile uint8_t  usart2_rx_buffer[BUFFER_SIZE];
 volatile uint16_t usart2_rx_index = 0;
 
+
+/// @brief Interrupt handler for button1 (built-in button)
 void EXTI15_10_IRQHandler() {
     if (EXTI->PR & EXTI_PR_PR13) {
         EXTI->PR       |= EXTI_PR_PR13;
@@ -34,17 +36,20 @@ void EXTI15_10_IRQHandler() {
     }
 }
 
-void USART2_IRQHandler(void) {
-    // Check if USART2 received data
-    if ((USART2->SR & USART_SR_RXNE) != 0) {
-        // Read the received data
+/// @brief Interrupt handler for USART2
+void USART2_IRQHandler() {
+    /* check if USART2 received data */
+    if (USART2->SR & USART_SR_RXNE) {
+        /* read the received data */
         uint8_t received_data = USART2->DR;
 
         if (usart2_rx_index < BUFFER_SIZE) {
             usart2_rx_buffer[usart2_rx_index++] = received_data;
         }
+
         if (usart2_rx_index == 2) {
             if (!usart2_rx_buffer[0] && !usart2_rx_buffer[1]) {
+                /* if the firs two bytes are 0, then issue a stop */
                 stop             = true;
                 tim2_done        = true;
                 tim3_done        = true;
@@ -55,56 +60,61 @@ void USART2_IRQHandler(void) {
         }
 
         uint8_t frame_length = usart2_rx_buffer[5] + 6;
-        // Check if the entire message has been received
         if (usart2_rx_index == frame_length) {
-            // Reset the byte count
+            /* full message has been received */
             usart2_rx_index  = 0;
             message_received = true;
         }
     }
 }
 
-void TIM2_IRQHandler(void) {
+/// @brief Interrupt handler for TIM2 (aka short)
+void TIM2_IRQHandler() {
     if (TIM2->SR & TIM_SR_UIF) {
-        TIM2->SR &= ~TIM_SR_UIF;
-        // Timer update event occurred
+        TIM2->SR  &= ~TIM_SR_UIF;
         tim2_done = true;
     }
 }
 
-void TIM3_IRQHandler(void) {
+/// @brief Interrupt handler for TIM3 (aka medium)
+void TIM3_IRQHandler() {
     if (TIM3->SR & TIM_SR_UIF) {
-        TIM3->SR &= ~TIM_SR_UIF;
-        // Timer update event occurred
+        TIM3->SR  &= ~TIM_SR_UIF;
         tim3_done = true;
     }
 }
 
-void TIM4_IRQHandler(void) {
+/// @brief Interrupt handler for TIM4 (aka long)
+void TIM4_IRQHandler() {
     if (TIM4->SR & TIM_SR_UIF) {
-        TIM4->SR &= ~TIM_SR_UIF;
-        // Timer update event occurred
+        TIM4->SR  &= ~TIM_SR_UIF;
         tim4_done = true;
     }
 }
 
+/// @brief Processing function for a frame
+/// @param frame The data frame to process
 void process_frame(uart_frame_t *frame) {
     set_tim(TIM2, frame->short_timer * 10);
     set_tim(TIM3, frame->medium_timer * 10);
     set_tim(TIM4, frame->long_timer * 10);
 
     if (frame->loop) {
+        /* should the message repeat */
         while (!stop) {
+            /* was a stop issued */
             string_to_morse(frame->msg, frame->msg_length);
         }
     } else {
         for (uint8_t i = 0; i < frame->nb_iter; ++i) {
             if (!stop) {
+                /* was a stop issued */
                 string_to_morse(frame->msg, frame->msg_length);
             }
         }
     }
 }
+
 
 int main(void) {
     init_RCC();
@@ -128,37 +138,33 @@ int main(void) {
     init_queue(&q);
 
     while (1) {
+        if (stop) {
+            /* if stop was raised stop all timers */
+            stop_tim(TIM2);
+            stop_tim(TIM3);
+            stop_tim(TIM4);
+            stop             = false;
+            message_received = false;
+            memset(usart2_rx_buffer, ' ', BUFFER_SIZE);
+            usart2_rx_index = 0;
+            break;
+        }
         if (message_received) {
+            /* create frame from what was received in USART2 */
             uart_frame_t frame;
             memset(&frame, 0, sizeof(uart_frame_t));
-
-            frame.loop         = usart2_rx_buffer[0];
-            frame.nb_iter      = usart2_rx_buffer[1];
-            frame.short_timer  = usart2_rx_buffer[2];
-            frame.medium_timer = usart2_rx_buffer[3];
-            frame.long_timer   = usart2_rx_buffer[4];
-            frame.msg_length   = usart2_rx_buffer[5];
-            for (int j = 0; j < frame.msg_length; j++) {
-                frame.msg[j] = usart2_rx_buffer[j + 6];
-            }
-
+            decode_frame(usart2_rx_buffer, &frame);
             queue_push(&q, frame);
             message_received = false;
             memset(usart2_rx_buffer, ' ', BUFFER_SIZE);
             usart2_rx_index = 0;
         }
         if (queue_size(&q)) {
+            /* process each element of the queue */
             uart_frame_t frame;
             memset(&frame, 0, sizeof(uart_frame_t));
             queue_pop(&q, &frame);
             process_frame(&frame);
-        }
-        if (stop) {
-            stop_tim(TIM2);
-            stop_tim(TIM3);
-            stop_tim(TIM4);
-            stop             = false;
-            message_received = false;
         }
         __asm("nop");
     }
