@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "stm32f10x_register.h": "c",
+        "stm32f103xb.h": "c",
+        "stm32f10x_register_config.h": "c",
+        "tim_utils.h": "c"
+    }
+}
