@@ -21,12 +21,12 @@ typedef struct settings_flag_s {
 
 void print_usage(char *prog_name) {
     fprintf(stderr,
-            "Usage: %s [-b] [-h] [-m MESSAGE] [-n REPEAT] [-s] [-t "
-            "TIMESTRING] [-T TIMER] -c COMPORT\n",
+            "Usage: %s -m MESSAGE[-b] [-h] [-n REPEAT] [-s] [-t "
+            "TIMESTRING] [-T TIMER] [-c COMPORT]\n",
             prog_name);
+    fprintf(stderr, "\t-m MESSAGE: set the MESSAGE to send of length < 256\n");
     fprintf(stderr, "\t-b: loop message\n");
     fprintf(stderr, "\t-h: show this message\n");
-    fprintf(stderr, "\t-m MESSAGE: set the MESSAGE to send of length < 256\n");
     fprintf(stderr, "\t-n REPEAT: repeat the message REPEAT times\n");
     fprintf(stderr, "\t-s: stop the program\n");
     fprintf(stderr, "\t-t TIMESTRING: setting up the timers with the format "
@@ -40,7 +40,6 @@ int main(int argc, char **argv) {
     extern char *optarg;
 
     int com_port = 1;
-
 
     uart_message_t uart_msg;
     uart_msg.loop      = 0;
@@ -87,6 +86,9 @@ int main(int argc, char **argv) {
                 } else {
                     flags.n_flag = true;
                     int v        = atoi(optarg);
+                    if (v < 0) {
+                        v = -v;
+                    }
                     if (v > 255) {
                         fprintf(stderr,
                                 "Number of iterations is too high"
@@ -106,6 +108,9 @@ int main(int argc, char **argv) {
                     flags.t_flag  = true;
                     flags.t__flag = false;
                     int v         = atoi(strtok(optarg, " "));
+                    if (v < 0) {
+                        v = -v;
+                    }
                     if (v > 255) {
                         fprintf(stderr,
                                 "Short timer is too high"
@@ -114,6 +119,9 @@ int main(int argc, char **argv) {
                     }
                     uart_msg.timers[0] = (unsigned char) v;
                     v                  = atoi(strtok(NULL, " "));
+                    if (v < 0) {
+                        v = -v;
+                    }
                     if (v > 255) {
                         fprintf(stderr,
                                 "Medium timer is too high"
@@ -122,6 +130,9 @@ int main(int argc, char **argv) {
                     }
                     uart_msg.timers[1] = (unsigned char) v;
                     v                  = atoi(strtok(NULL, " "));
+                    if (v < 0) {
+                        v = -v;
+                    }
                     if (v > 255) {
                         fprintf(stderr,
                                 "Long timer is too high"
@@ -139,6 +150,9 @@ int main(int argc, char **argv) {
                     flags.t__flag = true;
                     flags.t_flag  = false;
                     int v         = atoi(optarg);
+                    if (v < 0) {
+                        v = -v;
+                    }
                     if (v > 255) {
                         fprintf(stderr,
                                 "Short timer is too high"
@@ -172,7 +186,11 @@ int main(int argc, char **argv) {
                 break;
             case 'c':
                 flags.c_flag = true;
-                com_port     = atoi(optarg);
+                int v        = atoi(optarg);
+                if (v < 0) {
+                    v = -v;
+                }
+                com_port = v;
                 break;
             case 'h':
             default:
@@ -213,5 +231,6 @@ int main(int argc, char **argv) {
     print_uart_message(&uart_msg);
 
     send_uart_message(serial_port, &uart_msg);
+
     return 0;
 }

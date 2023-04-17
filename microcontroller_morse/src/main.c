@@ -2,6 +2,7 @@
 #include "gpio_utils.h"
 #include "morse_utils.h"
 #include "rcc_utils.h"
+#include "stm32f10x_register_config.h"
 #include "tim_utils.h"
 #include "uart_frame_utils.h"
 #include "uart_utils.h"
