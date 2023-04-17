@@ -53,8 +53,10 @@ void USART2_IRQHandler(void) {
                 message_received = true;
             }
         }
+
+        uint8_t frame_length = usart2_rx_buffer[5] + 6;
         // Check if the entire message has been received
-        if (usart2_rx_index == (usart2_rx_buffer[5] + 6)) {
+        if (usart2_rx_index == frame_length) {
             // Reset the byte count
             usart2_rx_index  = 0;
             message_received = true;
@@ -86,6 +88,24 @@ void TIM4_IRQHandler(void) {
     }
 }
 
+void process_frame(uart_frame_t *frame) {
+    set_tim(TIM2, frame->short_timer * 10);
+    set_tim(TIM3, frame->medium_timer * 10);
+    set_tim(TIM4, frame->long_timer * 10);
+
+    if (frame->loop) {
+        while (!stop) {
+            string_to_morse(frame->msg, frame->msg_length);
+        }
+    } else {
+        for (uint8_t i = 0; i < frame->nb_iter; ++i) {
+            if (!stop) {
+                string_to_morse(frame->msg, frame->msg_length);
+            }
+        }
+    }
+}
+
 int main(void) {
     init_RCC();
 
@@ -104,6 +124,9 @@ int main(void) {
     /* init input as interrupt */
     init_exti(&button1, RISING_EDGE);
 
+    uart_frame_queue_t q;
+    init_queue(&q);
+
     while (1) {
         if (message_received) {
             uart_frame_t frame;
@@ -119,24 +142,23 @@ int main(void) {
                 frame.msg[j] = usart2_rx_buffer[j + 6];
             }
 
-            set_tim(TIM2, frame.short_timer * 10);
-            set_tim(TIM3, frame.medium_timer * 10);
-            set_tim(TIM4, frame.long_timer * 10);
-
-            if (frame.loop) {
-                while (!stop) {
-                    string_to_morse(frame.msg, frame.msg_length);
-                }
-            } else {
-                for (uint8_t i = 0; i < frame.nb_iter; ++i) {
-                    if (!stop) {
-                        string_to_morse(frame.msg, frame.msg_length);
-                    }
-                }
-            }
+            queue_push(&q, frame);
             message_received = false;
             memset(usart2_rx_buffer, ' ', BUFFER_SIZE);
             usart2_rx_index = 0;
+        }
+        if (queue_size(&q)) {
+            uart_frame_t frame;
+            memset(&frame, 0, sizeof(uart_frame_t));
+            queue_pop(&q, &frame);
+            process_frame(&frame);
+        }
+        if (stop) {
+            stop_tim(TIM2);
+            stop_tim(TIM3);
+            stop_tim(TIM4);
+            stop             = false;
+            message_received = false;
         }
         __asm("nop");
     }
