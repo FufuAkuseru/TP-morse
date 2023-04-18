@@ -11,6 +11,10 @@ typedef struct uart_message_s {
     unsigned char stop;
 } uart_message_t;
 
+/// @brief Check if the timers are correctly ordered
+/// @param timers The timer array from a uart_message_t
+void check_timers(unsigned char *timers);
+
 /// @brief Prints the given Message on stdout
 /// @param uart_msg The message to display
 void print_uart_message(uart_message_t *uart_msg);
@@ -24,5 +28,6 @@ int uart_setup(int com_port);
 /// @param serial_port The termios serial port to send to
 /// @param uart_msg    The message to send
 void send_uart_message(int serial_port, uart_message_t *uart_msg);
+
 
 #endif

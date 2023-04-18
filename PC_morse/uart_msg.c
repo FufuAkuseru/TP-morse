@@ -8,6 +8,38 @@
 #include <string.h>
 #include <termios.h>
 
+void check_timers(unsigned char *timers) {
+    if (timers[2] <= timers[1]) {
+        fprintf(stderr,
+                "Long timer (%d) <= medium timer (%d). "
+                "Using default timer values\n",
+                timers[2], timers[1]);
+        timers[0] = 10;
+        timers[1] = 50;
+        timers[2] = 100;
+        return;
+    }
+    if (timers[2] <= timers[0]) {
+        fprintf(stderr,
+                "Long timer (%d) <= short timer (%d). "
+                "Using default timer values\n",
+                timers[2], timers[0]);
+        timers[0] = 10;
+        timers[1] = 50;
+        timers[2] = 100;
+        return;
+    }
+    if (timers[1] <= timers[0]) {
+        fprintf(stderr,
+                "Medium timer (%d) <= short timer (%d). "
+                "Using default timer  values\n",
+                timers[1], timers[0]);
+        timers[0] = 10;
+        timers[1] = 50;
+        timers[2] = 100;
+        return;
+    }
+}
 
 void print_uart_message(uart_message_t *uart_msg) {
     if (uart_msg->loop) {

@@ -75,7 +75,7 @@ int main(int argc, char **argv) {
                 flags.m_flag   = true;
                 size_t msg_len = strlen(optarg);
                 if (msg_len >= 249) {
-                    fprintf(stderr, "Message inputed is too long"
+                    fprintf(stderr, "Message inputed is too long "
                                     "(must be shorter than 249 characters)\n");
                     exit(1);
                 }
@@ -96,7 +96,7 @@ int main(int argc, char **argv) {
                     }
                     if (v > 255) {
                         fprintf(stderr,
-                                "Number of iterations is too high"
+                                "Number of iterations is too high "
                                 "(must be less than 256)\nDefaulting to 255\n");
                         uart_msg.nb_ite = 255;
                     } else {
@@ -124,7 +124,7 @@ int main(int argc, char **argv) {
                     }
                     if (v > 255) {
                         fprintf(stderr,
-                                "Short timer is too high"
+                                "Short timer is too high "
                                 "(must be less than 256)\nDefaulting to 255\n");
                         v = 255;
                     }
@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
                     }
                     if (v > 255) {
                         fprintf(stderr,
-                                "Medium timer is too high"
+                                "Medium timer is too high "
                                 "(must be less than 256)\nDefaulting to 255\n");
                         v = 255;
                     }
@@ -146,7 +146,7 @@ int main(int argc, char **argv) {
                     }
                     if (v > 255) {
                         fprintf(stderr,
-                                "Long timer is too high"
+                                "Long timer is too high "
                                 "(must be less than 256)\nDefaulting to 255\n");
                         v = 255;
                     }
@@ -155,7 +155,7 @@ int main(int argc, char **argv) {
                 break;
             case 'T':
                 /* process -T option */
-                if (!flags.t_flag) {
+                if (flags.t_flag) {
                     /* if -t was before */
                     fprintf(stderr, "Timers already defined by -t\n");
                     flags.t__flag = false;
@@ -168,26 +168,28 @@ int main(int argc, char **argv) {
                     }
                     if (v > 255) {
                         fprintf(stderr,
-                                "Short timer is too high"
+                                "Short timer is too high "
                                 "(must be less than 256)\nDefaulting to 255\n");
                         uart_msg.timers[0] = 255;
                     } else {
                         uart_msg.timers[0] = (unsigned char) v;
                     }
                     if (v * 3 > 255) {
-                        fprintf(stderr,
-                                "Short timer (%d) multiplied by 3 is too high"
-                                "(must be less than 256)\nDefaulting to 255\n",
-                                v);
+                        fprintf(
+                            stderr,
+                            "Short timer (%d) multiplied by 3 (%d) is too high "
+                            "(must be less than 256)\nDefaulting to 255\n",
+                            v, v * 3);
                         uart_msg.timers[1] = 255;
                     } else {
                         uart_msg.timers[1] = (unsigned char) v * 3;
                     }
                     if (v * 7 > 255) {
-                        fprintf(stderr,
-                                "Short timer (%d) multiplied by 7 is too high"
-                                "(must be less than 256)\nDefaulting to 255\n",
-                                v);
+                        fprintf(
+                            stderr,
+                            "Short timer (%d) multiplied by 7 (%d) is too high "
+                            "(must be less than 256)\nDefaulting to 255\n",
+                            v, v * 7);
                         uart_msg.timers[2] = 255;
                     } else {
                         uart_msg.timers[2] = (unsigned char) v * 7;
@@ -213,9 +215,10 @@ int main(int argc, char **argv) {
     }
 
     if (!flags.c_flag) {
-        printf("No COM port provided defaulting to COM1\n\n");
+        printf("No COM port provided defaulting to COM1\n");
     }
 
+    check_timers(uart_msg.timers);
     int serial_port = uart_setup(com_port);
 
     if (flags.s_flag) {
