@@ -21,18 +21,20 @@ typedef struct settings_flag_s {
 
 void print_usage(char *prog_name) {
     fprintf(stderr,
-            "Usage: %s -m MESSAGE[-b] [-h] [-n REPEAT] [-s] [-t "
-            "TIMESTRING] [-T TIMER] [-c COMPORT]\n",
+            "Usage: %s -m MESSAGE [-b] [-h] [-n REPEAT] [-s] [-t TIME_STRING] "
+            "[-T SHORT_TIMER] [-c COM_PORT]\n",
             prog_name);
-    fprintf(stderr, "\t-m MESSAGE: set the MESSAGE to send of length < 256\n");
+    fprintf(stderr, "\t-m MESSAGE: set the MESSAGE to send of length < 249\n");
     fprintf(stderr, "\t-b: loop message\n");
     fprintf(stderr, "\t-h: show this message\n");
     fprintf(stderr, "\t-n REPEAT: repeat the message REPEAT times\n");
     fprintf(stderr, "\t-s: stop the program\n");
-    fprintf(stderr, "\t-t TIMESTRING: setting up the timers with the format "
-                    "\"timer1 timer2 timer3\" as TIMESTRING\n");
-    fprintf(stderr, "\t-T TIMER: setting up the timers with a single value\n");
-    fprintf(stderr, "\t-c COMPORT: number of the COM port to send to\n");
+    fprintf(stderr, "\t-t TIME_STRING: setting up the timers with the format "
+                    "\"short_timer medium_timer long_timer\" as TIME_STRING "
+                    "(in centiseconds)\n");
+    fprintf(stderr, "\t-T SHORT_TIMER: setting up the timers with a single "
+                    "value (in centiseconds)\n");
+    fprintf(stderr, "\t-c COM_PORT: number of the COM port to send to\n");
 }
 
 int main(int argc, char **argv) {
@@ -129,7 +131,13 @@ int main(int argc, char **argv) {
                         v = 255;
                     }
                     uart_msg.timers[0] = (unsigned char) v;
-                    v                  = atoi(strtok(NULL, " "));
+                    char *num1_str     = strtok(NULL, " ");
+                    if (num1_str == NULL) {
+                        fprintf(stderr, "Not enough numbers in the TIMESTRING. "
+                                        "Remaining values set to default\n");
+                        break;
+                    }
+                    v = atoi(num1_str);
                     if (v < 0) {
                         v = -v;
                     }
@@ -140,7 +148,13 @@ int main(int argc, char **argv) {
                         v = 255;
                     }
                     uart_msg.timers[1] = (unsigned char) v;
-                    v                  = atoi(strtok(NULL, " "));
+                    char *num2_str     = strtok(NULL, " ");
+                    if (num2_str == NULL) {
+                        fprintf(stderr, "Not enough numbers in the TIMESTRING "
+                                        "Remaining values set to default\n");
+                        break;
+                    }
+                    v = atoi(num2_str);
                     if (v < 0) {
                         v = -v;
                     }
