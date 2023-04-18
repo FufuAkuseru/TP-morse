@@ -1,7 +1,7 @@
 #ifndef STR_TO_BLINK_h
 #define STR_TO_BLINK_h
 
-#include "stm32f10x_register_config.h"
+#include "stm32f10x_register.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>

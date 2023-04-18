@@ -1,5 +1,5 @@
 #include "exti_utils.h"
-
+#include "gpio_utils.h"
 
 /// @brief Sets up the correct AFIO_EXTICR for a given pin
 /// @param exti_pin A given pin

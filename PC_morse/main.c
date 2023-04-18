@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
     uart_msg.timers[2] = 100;
     uart_msg.msg_size  = 0;
     uart_msg.stop      = '\n';
-    memset(uart_msg.msg, 0, 1);
+    memset(uart_msg.msg, 0, 250);
 
     settings_flag_t flags = {false, false, false, false,
                              false, false, false, false};
@@ -57,7 +57,9 @@ int main(int argc, char **argv) {
     while ((c = getopt(argc, argv, "bhm:n:st:T:c:")) != -1) {
         switch (c) {
             case 'b':
+                /* process -b option */
                 if (flags.n_flag) {
+                    /* if -n was before */
                     fprintf(stderr, "-n and -b conflict with each other\n"
                                     "Defaulting to -b as disabled");
                     flags.b_flag  = false;
@@ -69,6 +71,7 @@ int main(int argc, char **argv) {
                 }
                 break;
             case 'm':
+                /* process -m option */
                 flags.m_flag   = true;
                 size_t msg_len = strlen(optarg);
                 if (msg_len >= 249) {
@@ -80,7 +83,9 @@ int main(int argc, char **argv) {
                 uart_msg.msg_size = (unsigned char) msg_len;
                 break;
             case 'n':
+                /* process -n option */
                 if (flags.b_flag) {
+                    /* if -b was before */
                     fprintf(stderr, "-b and -n conflict with each other\n"
                                     "Defaulting -n as 1");
                 } else {
@@ -101,10 +106,16 @@ int main(int argc, char **argv) {
                 }
                 break;
             case 's':
+                /* process -s */
                 flags.s_flag = true;
                 break;
             case 't':
-                if (!flags.t__flag) {
+                /* process -t */
+                if (flags.t__flag) {
+                    /* -T was before */
+                    fprintf(stderr, "Timers already defined by -T\n");
+                    flags.t_flag = false;
+                } else {
                     flags.t_flag  = true;
                     flags.t__flag = false;
                     int v         = atoi(strtok(optarg, " "));
@@ -140,13 +151,15 @@ int main(int argc, char **argv) {
                         v = 255;
                     }
                     uart_msg.timers[2] = (unsigned char) v;
-                } else {
-                    fprintf(stderr, "Timers already defined by -T\n");
-                    flags.t_flag = false;
                 }
                 break;
             case 'T':
+                /* process -T option */
                 if (!flags.t_flag) {
+                    /* if -t was before */
+                    fprintf(stderr, "Timers already defined by -t\n");
+                    flags.t__flag = false;
+                } else {
                     flags.t__flag = true;
                     flags.t_flag  = false;
                     int v         = atoi(optarg);
@@ -179,12 +192,10 @@ int main(int argc, char **argv) {
                     } else {
                         uart_msg.timers[2] = (unsigned char) v * 7;
                     }
-                } else {
-                    fprintf(stderr, "Timers already defined by -t\n");
-                    flags.t__flag = false;
                 }
                 break;
             case 'c':
+                /* process -c option */
                 flags.c_flag = true;
                 int v        = atoi(optarg);
                 if (v < 0) {

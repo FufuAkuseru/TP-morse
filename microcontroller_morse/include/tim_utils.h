@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#include "stm32f10x_register_config.h"
+#include "stm32f10x_register.h"
 
 /// @brief Initializes timer
 /// @param TIM Timer to initialize (must be TIM2/3/4)

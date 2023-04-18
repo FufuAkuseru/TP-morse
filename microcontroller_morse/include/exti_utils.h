@@ -1,7 +1,7 @@
 #ifndef EXTI_UTILS_H
 #define EXTI_UTILS_H
 
-#include "stm32f10x_register_config.h"
+#include "stm32f10x_register.h"
 
 typedef enum edge_mode_e { RISING_EDGE, FALLING_EDGE } edge_mode_t;
 

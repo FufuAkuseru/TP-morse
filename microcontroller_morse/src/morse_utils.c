@@ -135,6 +135,9 @@ void string_to_morse(uint8_t *str, uint8_t str_length) {
             /* converts to morse the character */
             char *morse_code;
             if (isalpha(current_char)) {
+                if (current_char - 'a' > 25) {
+                    morse_code = "";
+                }
                 morse_code = morse_letters[current_char - 'a'];
             } else if (isdigit(current_char)) {
                 morse_code = morse_digits[current_char - '0'];
@@ -142,15 +145,12 @@ void string_to_morse(uint8_t *str, uint8_t str_length) {
                 morse_code = get_morse_punct(current_char);
             }
             for (int j = 0; j < strlen(morse_code); j++) {
-                /* for dot/dash in the morse representation */
+                /* for each dot/dash in the morse representation */
                 char current_morse_char = morse_code[j];
-                switch (current_morse_char) {
-                    case '.':
-                        short_blink();
-                        break;
-                    case '-':
-                    default:
-                        medium_blink();
+                if (current_morse_char == '.') {
+                    short_blink();
+                } else if (current_morse_char == '-') {
+                    medium_blink();
                 }
                 /* between each dot/dash waits a short amount of time */
                 short_wait();

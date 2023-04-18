@@ -2,7 +2,7 @@
 #include "gpio_utils.h"
 #include "morse_utils.h"
 #include "rcc_utils.h"
-#include "stm32f10x_register_config.h"
+#include "stm32f10x_register.h"
 #include "tim_utils.h"
 #include "uart_frame_utils.h"
 #include "uart_utils.h"
@@ -135,10 +135,9 @@ int main(void) {
     /* init input as interrupt */
     init_exti(&button1, RISING_EDGE);
 
-    uart_frame_queue_t q;
-    init_queue(&q);
 
     while (1) {
+        __WFI();
         if (stop) {
             /* if stop was raised stop all timers */
             stop_tim(TIM2);
@@ -155,17 +154,10 @@ int main(void) {
             uart_frame_t frame;
             memset(&frame, 0, sizeof(uart_frame_t));
             decode_frame(usart2_rx_buffer, &frame);
-            queue_push(&q, frame);
+            process_frame(&frame);
             message_received = false;
             memset(usart2_rx_buffer, ' ', BUFFER_SIZE);
             usart2_rx_index = 0;
-        }
-        if (queue_size(&q)) {
-            /* process each element of the queue */
-            uart_frame_t frame;
-            memset(&frame, 0, sizeof(uart_frame_t));
-            queue_pop(&q, &frame);
-            process_frame(&frame);
         }
         __asm("nop");
     }
