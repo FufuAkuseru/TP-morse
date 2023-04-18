@@ -135,7 +135,6 @@ int main(void) {
     /* init input as interrupt */
     init_exti(&button1, RISING_EDGE);
 
-
     while (1) {
         __WFI();
         if (stop) {
