@@ -135,6 +135,7 @@ void string_to_morse(uint8_t *str, uint8_t str_length) {
             /* converts to morse the character */
             char *morse_code;
             if (isalpha(current_char)) {
+                current_char = tolower(current_char);
                 if (current_char - 'a' > 25) {
                     morse_code = "";
                 }
