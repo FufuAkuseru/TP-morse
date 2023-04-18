@@ -4,11 +4,6 @@
 #include "uart_frame_utils.h"
 
 void decode_frame(uint8_t *usart2_rx_buffer, uart_frame_t *frame) {
-    if (usart2_rx_buffer[0] != 0) {
-        if (usart2_rx_buffer[0] != 1) {
-            return;
-        }
-    }
     frame->loop         = usart2_rx_buffer[0];
     frame->nb_iter      = usart2_rx_buffer[1];
     frame->short_timer  = usart2_rx_buffer[2];
