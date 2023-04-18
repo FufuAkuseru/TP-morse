@@ -139,7 +139,7 @@ int main(int argc, char **argv) {
                                 "(must be less than 256)\nDefaulting to 255\n");
                         v = 255;
                     }
-                    uart_msg.timers[0] = (unsigned char) v;
+                    uart_msg.timers[2] = (unsigned char) v;
                 } else {
                     fprintf(stderr, "Timers already defined by -T\n");
                     flags.t_flag = false;
